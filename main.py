@@ -1,12 +1,12 @@
 import streamlit as st
 import google.generativeai as genai
 
-# Page configuration
+# Page ki setting
 st.set_page_config(page_title="Dreamz Hunter AI", page_icon="🕵️‍♂️")
 st.title("🎬 Dreamz Hunter AI Assistant")
-st.caption("Your personal co-writer for dark, cinematic suspense scripts.")
+st.caption("Munawar Khan's personal co-writer for dark suspense scripts.")
 
-# Sidebar for API Key
+# Sidebar mein API key ka dabba
 with st.sidebar:
     st.header("⚙️ Setup")
     api_key = st.text_input("Enter your Google Gemini API Key:", type="password")
@@ -14,44 +14,43 @@ with st.sidebar:
 
 if api_key:
     try:
-        # Initializing the SDK
+        # API configure karna
         genai.configure(api_key=api_key)
         
-        # System Instruction for your specific niche
+        # Bot ko uski pehchan batana
         instruction = (
             "Tumhara naam Dreamz Hunter AI hai. Tum Munawar Khan ke YouTube channel ke liye kaam karte ho. "
-            "Tumhe dark, mysterious documentaries (jaise Bhangarh Fort, Mary Celeste) aur "
-            "3D animation style ki Hindi moral stories likhni hain. Tumhara tone hamesha thriller aur engaging hona chahiye."
+            "Tumhe dark, mysterious documentaries aur 3D animation style ki Hindi moral stories likhni hain. "
+            "Tumhara tone hamesha thriller aur engaging hona chahiye."
         )
 
-        # Loading the model explicitly
-        model = genai.GenerativeModel(
-            model_name='gemini-1.5-flash',
-            system_instruction=instruction
-        )
+        # Model ko load karna (Sahi tareeka)
+        model = genai.GenerativeModel(model_name='gemini-1.5-flash')
 
-        # Maintain chat history
-        if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
+        # Chat history ko sambhalna
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
 
-        # Display past messages
-        for message in st.session_state.chat_history:
+        # Purani baatein screen par dikhana
+        for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
-        # User input box
-        if prompt := st.chat_input("Write your script idea here..."):
-            st.session_state.chat_history.append({"role": "user", "content": prompt})
+        # User ka naya sawal
+        if prompt := st.chat_input("Bhangarh Fort ya Amazon ki koi mystery pucho..."):
+            st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
                 st.markdown(prompt)
 
-            # Generate response
+            # AI ka jawab generate karna
             with st.chat_message("assistant"):
-                response = model.generate_content(prompt)
+                # System instruction ko prompt ke sath jodna taaki error na aaye
+                full_prompt = f"{instruction}\n\nUser Question: {prompt}"
+                response = model.generate_content(full_prompt)
                 st.markdown(response.text)
-                st.session_state.chat_history.append({"role": "assistant", "content": response.text})
+                st.session_state.messages.append({"role": "assistant", "content": response.text})
                 
     except Exception as e:
-        st.error(f"Almost there! Please check your API key or connection. Error: {e}")
+        st.error(f"Almost there! Error: {e}")
 else:
-    st.warning("👈 Please enter your Gemini API Key in the sidebar to wake up the assistant.")
+    st.warning("👈 Please enter your Gemini API Key in the sidebar.")
