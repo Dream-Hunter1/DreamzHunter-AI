@@ -32,3 +32,4 @@ if api_key:
 else:
 
     st.warning("👈 Please enter your Gemini API Key in the sidebar.")
+
