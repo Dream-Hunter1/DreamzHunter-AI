@@ -30,4 +30,5 @@ if api_key:
             response = st.session_state.chat_session.send_message(user_prompt)
             st.markdown(response.text)
 else:
+
     st.warning("👈 Please enter your Gemini API Key in the sidebar.")
